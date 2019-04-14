@@ -1,0 +1,6 @@
+[submodule "gsl"]
+	path = gsl
+	url = git://git.savannah.gnu.org/gsl.git
+[submodule "htslib"]
+	path = htslib
+	url = https://github.com/samtools/htslib
