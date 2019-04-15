@@ -1,0 +1,88 @@
+* UGAT
+** About
+
+~UGAT~ implements a method to fit an exponential decay to the first 20 base
+pairs of C-to-T conversions typically observed in ancient DNA (aDNA) sequencing
+data.
+
+A BAM file is needed with reads aligned to a suitable reference genome. From
+these alignments, substitution patterns are extracted with the help of ~htslib~,
+and the frequency of C-to-T conversions at the first 20 bases from the 5'-end is
+extracted.
+
+This frequency pattern is then used to fit an exponential decay with a
+non-linear least squares regression using the Levenberg-Marquardt algorithm
+implemented in the GNU Scientific Library. From the best fit parameters, a
+one-sided p-value of the rate parameter is reported to test for significant
+exponential decay.
+
+To test how this p-value behaves for specified numbers of sequences, ~UGAT~ also
+implements two ways of subsampling alignments from the BAM file either by
+specifying a target number or target fraction of alignments to sample.
+
+For more background see also the publication at [[https://elifesciences.org/articles/10005][elife]], which describes an
+~R~-based version of the method re-implemented here.
+
+** Get it
+
+~UGAT~ makes use of two external libraries, which are included as submodules in
+this repository. These libraries are the GNU Scientific Library (~GSL~), and
+~htslib~.
+
+To get the ~UGAT~ source code, as well as the required library code, clone the
+repository recursively:
+
+#+BEGIN_SRC bash
+git clone --recursive https://github.com/clwgg/ugat
+#+END_SRC
+
+Please note, that you will need ~libtool~ installed to compile the ~GSL~
+library, along with the regular GNU toolchain for compilation.
+
+After cloning, first compile the submodules, and then the ~UGAT~ code:
+
+#+BEGIN_SRC bash
+cd ugat
+make submodules
+make
+#+END_SRC
+
+This will create the static ~ugat~ binary, which you can copy or move
+anywhere for subsequent use.
+
+*** Updating
+
+When updating to the current version, please make sure to also update the
+submodules:
+
+#+BEGIN_SRC bash
+git pull origin master
+git submodule update
+make submodules
+make
+#+END_SRC
+
+** Usage
+
+#+BEGIN_SRC bash :results output example replace :exports results
+./ugat; echo
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+Usage: ./ugat [options]
+
+Options:
+	-b	-	BAM file
+
+	-n	-	Number to subsample (in conflict with -f)
+	-s	-	Seed for random subsample
+	-f	-	Fraction to subsample (in conflict with -n)
+
+	-t	-	Show C to T fraction at first 20 bases instead of exp-fit p-value
+	-c	-	Just count alignments in BAM file, no subsampling is done (conflict with -f, -n, -t and -s)
+
+
+#+end_example
+
