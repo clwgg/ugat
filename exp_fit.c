@@ -117,23 +117,14 @@ double run_fit(int freq[20][6])
   gsl_multifit_fdfsolver_jac(s, J);
   gsl_multifit_covar(J, 0.0, covar);
 
-  // calculate sigma for scaling of error
-  gsl_vector *res_sq = gsl_vector_alloc(data.n);
-  gsl_vector_memcpy(res_sq, res_f);
-  gsl_vector_mul(res_sq, res_f);
-  double ssr = gsl_blas_dasum(res_sq);
-  gsl_vector_free(res_sq);
-
   double dof = data.n - n_param;
-  double sigma = sqrt(ssr/dof);
+  double sigma = chi / sqrt(dof);
 
   #define FIT(i) gsl_vector_get(s->x, i)
   #define ERR(i) sqrt(gsl_matrix_get(covar,i,i))
 
-  double c = GSL_MAX_DBL(1, chi / sqrt(dof)); 
-
   // get t-value and one-sided p-value
-  double lam_t = FIT(0) / (c*ERR(0) * sigma);
+  double lam_t = FIT(0) / (ERR(0) * sigma);
   double lam_p = gsl_cdf_tdist_Q(lam_t, dof);
 
   gsl_multifit_fdfsolver_free (s);
